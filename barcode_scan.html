@@ -17,47 +17,33 @@ body { margin:0; padding:0; font-family:sans-serif; background:#000; color:#fff;
 
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script>
-const sheetUrl = 'https://script.google.com/macros/s/AKfycbxPuGjJuAMy3axvz_vohJFa3Q80QtCQYjd_dp6Qd-4Y7EbrK7KbLgHQMkujLtlJ3mmIKQ/exec'; // GAS 웹 앱 URL
+const sheetUrl = 'https://script.google.com/macros/s/AKfycbzD1qDfmEUyhYTR9tv_rah7xN4Ramcbpd5X_a3jaLQP4tptpgWv2i_JgNo6Ig-v5YK1vA/exec'; // 배포한 GAS URL 입력
 const message = document.getElementById('message');
 
-function showMessage(msg, duration=1500){
-  message.textContent = msg;
-  setTimeout(()=>{ message.textContent=''; }, duration);
-}
+function showMessage(msg,d=1500){ message.textContent=msg; setTimeout(()=>{message.textContent='';},d); }
 
 function sendToSheet(studentId){
-  fetch(sheetUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ studentId })
-  })
+  fetch(sheetUrl, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({studentId}) })
   .then(res=>res.json())
   .then(data=>{
-    if(data.status==='duplicate') showMessage('이미 처리되었습니다',1500);
-    else if(data.status==='ok') showMessage('등록 완료',1500);
-    else showMessage('오류 발생',1500);
+    if(data.status==='duplicate') showMessage('이미 처리되었습니다');
+    else if(data.status==='ok') showMessage('등록 완료');
+    else showMessage('오류 발생');
   })
-  .catch(err=>{
-    console.error(err);
-    showMessage('통신 오류',1500);
-  });
+  .catch(err=>{ console.error(err); showMessage('통신 오류'); });
 }
 
 const html5QrCode = new Html5Qrcode("reader");
 
 html5QrCode.start(
-  { facingMode: "environment" }, // 후면카메라
-  { fps: 10, qrbox: 250 },
-  (decodedText, decodedResult) => {
-    showMessage("스캔 완료", 1000);
-    sendToSheet(decodedText);
+  { facingMode: "environment" }, 
+  { fps:10, qrbox:250 },
+  (decodedText)=>{
+      showMessage("스캔 완료");
+      sendToSheet(decodedText);
   },
-  (errorMessage) => {
-    // console.log(errorMessage);
-  }
-).catch(err => {
-  showMessage("카메라 오류");
-});
+  (errorMessage)=>{}
+).catch(err=>{ showMessage("카메라 오류"); });
 </script>
 
 </body>
